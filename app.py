@@ -54,7 +54,7 @@ def fetch_sku_data_by_parent(parent_code, df):
 
 from twilio.twiml.messaging_response import MessagingResponse
 
-def chunk_message(text, limit=1500):
+def chunk_message(text, limit=3500):
     lines = text.split("\n")
     chunks = []
     current = ""
@@ -81,7 +81,9 @@ def whatsapp_bot():
 
     # Create Twilio response
     resp = MessagingResponse()
-    msg = resp.message(chunks[0])
+    for chunk in chunks:
+        resp.message(chunk)
+    # msg = resp.message(chunks[0])
 
     # resp = MessagingResponse()
     # resp.message(reply)
