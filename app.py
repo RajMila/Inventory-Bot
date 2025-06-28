@@ -17,21 +17,9 @@ app = Flask(__name__)
 
 def authorize_oauth():
     scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    flow = Flow.from_client_secrets_file(
-        '/etc/secrets/client_secret.json',
-        scopes=scope,
-        redirect_uri='urn:ietf:wg:oauth:2.0:oob'
-    )
-
-    auth_url, _ = flow.authorization_url(prompt='consent')
-
-    # Show link in logs so you can manually paste the token one time
-    print("🔐 Go to this URL and authorize:\n", auth_url)
-    code = input("Paste the authorization code here: ")
-
-    flow.fetch_token(code=code)
-
-    creds = flow.credentials
+    with open('/etc/secrets/token.json') as f:
+        token_data = json.load(f)
+    creds = Credentials.from_authorized_user_info(token_data)
     return gspread.authorize(creds)
     
     # store = Storage('/etc/secrets/token.json')
