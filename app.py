@@ -77,7 +77,7 @@ def whatsapp_bot():
 
     df = load_sheet_data()
     reply = fetch_sku_data_by_parent(parent_code, df)
-    chunks = chunk_message(reply_text)
+    chunks = chunk_message(reply)
 
     # Create Twilio response
     resp = MessagingResponse()
