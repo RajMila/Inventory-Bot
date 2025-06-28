@@ -9,20 +9,31 @@ import os, json
 from oauth2client.service_account import ServiceAccountCredentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
+
 
 
 app = Flask(__name__)
 
 def authorize_oauth():
     scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    flow = InstalledAppFlow.from_client_secrets_file(
-        '/etc/secrets/client_secret.json', scopes=scope
+    flow = Flow.from_client_secrets_file(
+        '/etc/secrets/client_secret.json',
+        scopes=scope,
+        redirect_uri='urn:ietf:wg:oauth:2.0:oob'
     )
 
-    # Run the flow in console mode (without storing token.json)
-    creds = flow.run_console()
+    auth_url, _ = flow.authorization_url(prompt='consent')
 
+    # Show link in logs so you can manually paste the token one time
+    print("🔐 Go to this URL and authorize:\n", auth_url)
+    code = input("Paste the authorization code here: ")
+
+    flow.fetch_token(code=code)
+
+    creds = flow.credentials
     return gspread.authorize(creds)
+    
     # store = Storage('/etc/secrets/token.json')
     # creds = store.get()
     # if not creds or creds.invalid:
