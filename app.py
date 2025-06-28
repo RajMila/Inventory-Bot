@@ -14,10 +14,10 @@ def authorize_oauth():
     scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
     # google_creds = json.loads(os.environ.get("GOOGLE_CREDENTIALS"))
     # creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds, scope)
-    store = Storage('/secrets/token.json')
+    store = Storage('/etc/secrets/token.json')
     creds = store.get()
     if not creds or creds.invalid:
-        flow = flow_from_clientsecrets('/secrets/client_secret.json', scope)
+        flow = flow_from_clientsecrets('/etc/secrets/client_secret.json', scope)
         creds = run_flow(flow, store, argparser.parse_args([]))
     return gspread.authorize(creds)
 
