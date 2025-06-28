@@ -7,19 +7,28 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.tools import run_flow, argparser
 import os, json
 from oauth2client.service_account import ServiceAccountCredentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.credentials import Credentials
+
 
 app = Flask(__name__)
 
 def authorize_oauth():
     scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    # google_creds = json.loads(os.environ.get("GOOGLE_CREDENTIALS"))
-    # creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds, scope)
-    store = Storage('/etc/secrets/token.json')
-    creds = store.get()
-    if not creds or creds.invalid:
-        flow = flow_from_clientsecrets('/etc/secrets/client_secret.json', scope)
-        creds = run_flow(flow, store, argparser.parse_args([]))
+    flow = InstalledAppFlow.from_client_secrets_file(
+        '/etc/secrets/client_secret.json', scopes=scope
+    )
+
+    # Run the flow in console mode (without storing token.json)
+    creds = flow.run_console()
+
     return gspread.authorize(creds)
+    # store = Storage('/etc/secrets/token.json')
+    # creds = store.get()
+    # if not creds or creds.invalid:
+    #     flow = flow_from_clientsecrets('/etc/secrets/client_secret.json', scope)
+    #     creds = run_flow(flow, store, argparser.parse_args([]))
+    # return gspread.authorize(creds)
 
 def load_sheet_data():
     client = authorize_oauth()
