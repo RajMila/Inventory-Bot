@@ -52,6 +52,24 @@ def fetch_sku_data_by_parent(parent_code, df):
         )
     return "\n".join(messages)
 
+from twilio.twiml.messaging_response import MessagingResponse
+
+def chunk_message(text, limit=1500):
+    lines = text.split("\n")
+    chunks = []
+    current = ""
+
+    for line in lines:
+        if len(current + "\n" + line) < limit:
+            current += "\n" + line
+        else:
+            chunks.append(current.strip())
+            current = line
+    if current:
+        chunks.append(current.strip())
+    return chunks
+
+
 @app.route("/whatsapp", methods=["POST"])
 def whatsapp_bot():
     msg = request.values.get('Body', '').strip().upper()
@@ -59,9 +77,14 @@ def whatsapp_bot():
 
     df = load_sheet_data()
     reply = fetch_sku_data_by_parent(parent_code, df)
+    chunks = chunk_message(reply_text)
 
+    # Create Twilio response
     resp = MessagingResponse()
-    resp.message(reply)
+    msg = resp.message(chunks[0])
+
+    # resp = MessagingResponse()
+    # resp.message(reply)
     return str(resp)
 
 if __name__ == "__main__":
