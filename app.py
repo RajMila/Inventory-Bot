@@ -73,7 +73,7 @@ def chunk_message(text, limit=1500):
 @app.route("/whatsapp", methods=["POST"])
 def whatsapp_bot():
     msg = request.values.get('Body', '').strip().upper()
-    parent_code = msg.replace("CHECK", "").strip()
+    parent_code = msg.replace("STOCK", "").strip()
 
     df = load_sheet_data()
     reply = fetch_sku_data_by_parent(parent_code, df)
